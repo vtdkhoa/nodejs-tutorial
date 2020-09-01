@@ -13,7 +13,7 @@ console.log(parsedData.title)
 
 // fs.writeFileSync('books.json', bookJSON)
 
-const dataBuffer = fs.readFileSync('books.json')
+const dataBuffer = fs.readFileSync('json/books.json')
 const dataJSON = dataBuffer.toString()
 const data = JSON.parse(dataJSON)
 

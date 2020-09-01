@@ -10,13 +10,13 @@ const me = {
 const meJSON = JSON.stringify(me)
 const parsedData = JSON.parse(meJSON)
 console.log(`My name is ${parsedData.name}`)
-fs.writeFileSync('me.json', meJSON)
+fs.writeFileSync('json/me.json', meJSON)
 
 // Edit JSON data
-const dataBuffer = fs.readFileSync('me.json')
+const dataBuffer = fs.readFileSync('json/me.json')
 const dataJSON = dataBuffer.toString()
 const updatedMe = JSON.parse(dataJSON)
 
 updatedMe.name = 'Dang Khoa'
 const updatedMeJSON = JSON.stringify(updatedMe)
-fs.writeFileSync('me.json', updatedMeJSON)
+fs.writeFileSync('json/me.json', updatedMeJSON)
