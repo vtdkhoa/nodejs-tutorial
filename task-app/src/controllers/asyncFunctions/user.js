@@ -15,24 +15,9 @@ const getProfile = async (req, res) => {
   res.send(req.user)
 }
 
-const getUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id)
-    if (!user) {
-      return res.status(404).send()
-    }
-    res.status(200).send(user)
-  } catch (error) {
-    res.status(500).send(error)
-  }
-}
-
 const deleteUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id)
-    if (!user) {
-      return res.status(404).send()
-    }
+    await req.user.remove()
     res.status(200).send(user)
   } catch (error) {
     res.status(500).send()
@@ -53,14 +38,9 @@ const updateUser = async (req, res) => {
   }
 
   try {
-    const user = await User.findById(req.params.id)
-    updates.forEach(update => user[update] = req.body[update])
-    await user.save()
-
-    if (!user) {
-      return res.status(404).send()
-    }
-    res.status(200).send(user)
+    updates.forEach(update => req.user[update] = req.body[update])
+    await req.user.save()
+    res.status(200).send(req.user)
   } catch (error) {
     res.status(400).send(error)
   }
@@ -68,10 +48,8 @@ const updateUser = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const user = await User.findByCredentials(
-      req.body.email,
-      req.body.password
-    )
+    const { email, password } = req.body
+    const user = await User.findByCredentials(email, password)
     const token = await user.generateAuthToken()
     res.send({ user, token })
   } catch (error) {
@@ -79,11 +57,34 @@ const login = async (req, res) => {
   }
 }
 
+const logout = async (req, res) => {
+  try {
+    req.user.tokens = req.user.tokens.filter(
+      token => token.token !== req.token
+    )
+    await req.user.save()
+    res.send()
+  } catch (error) {
+    res.status(500).send()
+  }
+}
+
+const logoutAll = async (req, res) => {
+  try {
+    req.user.tokens = []
+    await req.user.save()
+    res.send()
+  } catch (error) {
+    res.status(500).send()
+  }
+}
+
 module.exports = {
   postUser,
   getProfile,
-  getUser,
   deleteUser,
   updateUser,
-  login
+  login,
+  logout,
+  logoutAll
 }
