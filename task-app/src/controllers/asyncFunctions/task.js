@@ -1,10 +1,14 @@
 const Task = require('../../models/task')
 
 const postTask = async (req, res) => {
-  const newTask = new Task(req.body)
+  const task = new Task({
+    ...req.body,
+    owner: req.user._id
+  })
+
   try {
-    await newTask.save()
-    res.status(201).send(newTask)
+    await task.save()
+    res.status(201).send(task)
   } catch (error) {
     res.status(400).send(error)
   }
@@ -12,8 +16,8 @@ const postTask = async (req, res) => {
 
 const getAllTasks = async (req, res) => {
   try {
-    const tasks = await Task.find({})
-    res.status(200).send(tasks)
+    await req.user.populate('tasks').execPopulate()
+    res.status(200).send(req.user.tasks)
   } catch (error) {
     res.status(500).send(error)
   }
@@ -21,7 +25,10 @@ const getAllTasks = async (req, res) => {
 
 const getTask = async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id)
+    const task = await Task.findOne({
+      _id: req.params.id,
+      owner: req.user._id
+    })
     if (!task) {
       return res.status(404).send()
     }
@@ -33,11 +40,16 @@ const getTask = async (req, res) => {
 
 const deleteTask = async (req, res) => {
   try {
-    const task = await Task.findByIdAndDelete(req.params.id)
+    const task = await Task.findOneAndDelete({
+      _id: req.params.id,
+      owner: req.user.id
+    })
     if (!task) {
       return res.status(404).send()
     }
-    res.status(200).send(task)
+    res.status(200).send({
+      message: 'Delete task successfully!'
+    })
   } catch (error) {
     res.status(500).send()
   }
@@ -57,13 +69,17 @@ const updateTask = async (req, res) => {
   }
 
   try {
-    const task = await Task.findById(req.params.id)
-    updates.forEach(update => task[update] = req.body[update])
-    await task.save()
+    const task = await Task.findOne({
+      _id: req.params.id,
+      owner: req.user._id
+    })
 
     if (!task) {
       return res.status(404).send()
     }
+
+    updates.forEach(update => task[update] = req.body[update])
+    await task.save()
     res.status(200).send(task)
   } catch (error) {
     res.status(404).send(error)
