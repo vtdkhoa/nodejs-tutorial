@@ -5,7 +5,7 @@ const router = new express.Router()
 
 router.post('/tasks', auth, taskControllers.postTask)
 
-router.get('/tasks', auth, taskControllers.getAllTasks)
+router.get('/tasks', auth, taskControllers.getTasks)
 
 router.get('/tasks/:id', auth, taskControllers.getTask)
 

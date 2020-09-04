@@ -14,9 +14,32 @@ const postTask = async (req, res) => {
   }
 }
 
-const getAllTasks = async (req, res) => {
+// GET /tasks?status=true
+// GET /tasks?limit=10&skip=20
+// GET /tasks?sortBy=createdAt:desc
+const getTasks = async (req, res) => {
+  const match = {}
+  const sort = {}
+
+  if (req.query.status) {
+    match.status = req.query.status === 'true'
+  }
+
+  if (req.query.sortBy) {
+    const parts = req.query.sortBy.split(':')
+    sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
+  }
+
   try {
-    await req.user.populate('tasks').execPopulate()
+    await req.user.populate({
+      path: 'tasks',
+      match,
+      options: {
+        limit: parseInt(req.query.limit),
+        skip: parseInt(req.query.skip),
+        sort
+      }
+    }).execPopulate()
     res.status(200).send(req.user.tasks)
   } catch (error) {
     res.status(500).send(error)
@@ -88,7 +111,7 @@ const updateTask = async (req, res) => {
 
 module.exports = {
   postTask,
-  getAllTasks,
+  getTasks,
   getTask,
   deleteTask,
   updateTask
