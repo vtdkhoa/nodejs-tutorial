@@ -1,15 +1,16 @@
 const express = require('express')
-const router = new express.Router()
 const taskControllers = require('../controllers/asyncFunctions/task')
+const auth = require('../middleware/auth')
+const router = new express.Router()
 
-router.post('/tasks', taskControllers.postTask)
+router.post('/tasks', auth, taskControllers.postTask)
 
-router.get('/tasks', taskControllers.getAllTasks)
+router.get('/tasks', auth, taskControllers.getTasks)
 
-router.get('/tasks/:id', taskControllers.getTask)
+router.get('/tasks/:id', auth, taskControllers.getTask)
 
-router.delete('/tasks/:id', taskControllers.deleteTask)
+router.delete('/tasks/:id', auth, taskControllers.deleteTask)
 
-router.patch('/tasks/:id', taskControllers.updateTask)
+router.patch('/tasks/:id', auth, taskControllers.updateTask)
 
 module.exports = router

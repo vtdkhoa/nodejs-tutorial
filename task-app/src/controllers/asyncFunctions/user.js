@@ -1,11 +1,11 @@
 const User = require('../../models/user')
 
 const postUser = async (req, res) => {
-  const newUser = new User(req.body)
+  const user = new User(req.body)
   try {
-    await newUser.save()
-    const token = await newUser.generateAuthToken()
-    res.status(201).send({ newUser, token })
+    await user.save()
+    const token = await user.generateAuthToken()
+    res.status(201).send({ user, token })
   } catch (error) {
     res.status(400).send(error)
   }
@@ -83,6 +83,18 @@ const logoutAll = async (req, res) => {
   }
 }
 
+const uploadAvatar = async (req, res) => {
+  req.user.avatar = req.file.buffer
+  await req.user.save()
+  res.send()
+}
+
+const deleteAvatar = async (req, res) => {
+  req.user.avatar = undefined
+  await req.user.save()
+  res.send()
+}
+
 module.exports = {
   postUser,
   getProfile,
@@ -90,5 +102,7 @@ module.exports = {
   updateUser,
   login,
   logout,
-  logoutAll
+  logoutAll,
+  uploadAvatar,
+  deleteAvatar
 }
