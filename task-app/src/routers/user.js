@@ -1,6 +1,6 @@
 const express = require('express')
 const multer = require('multer')
-const userControllers = require('../controllers/asyncFunctions/user')
+const userControllers = require('../controllers/asyncs/user')
 const auth = require('../middleware/auth')
 const router = new express.Router()
 
@@ -45,5 +45,7 @@ router.post(
 )
 
 router.delete('/users/me/avatar', auth, userControllers.deleteAvatar)
+
+router.get('/users/:id/avatar', userControllers.getAvatar)
 
 module.exports = router
