@@ -1,5 +1,5 @@
 const express = require('express')
-const taskControllers = require('../controllers/asyncFunctions/task')
+const taskControllers = require('../controllers/asyncs/task')
 const auth = require('../middleware/auth')
 const router = new express.Router()
 
