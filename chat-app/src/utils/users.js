@@ -47,7 +47,7 @@ const getUser = id => {
       error: 'Cannot find user!'
     }
   }
-  return { user }
+  return user
 }
 
 // Todo: Getting all users in room

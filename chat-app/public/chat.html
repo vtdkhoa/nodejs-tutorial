@@ -5,23 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chat App</title>
   <link rel="shortcut icon" href="/img/favicon.png" type="image/x-icon">
-  <link rel="stylesheet" href="/css/styles.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
   <div class="chat">
     <!-- chat__sidebar -->
-    <div class="chat__sidebar">
-
-    </div>
+    <div id="sidebar" class="chat__sidebar"></div>
     <!-- /chat__sidebar -->
 
     <!-- chat__main -->
     <div class="chat__main">
-      <div class="chat__messages" id="messages"></div>
+      <div id="messages" class="chat__messages"></div>
+
       <!-- compose -->
       <div class="compose">
         <form id="message-form">
-          <input name="message" type="text" placeholder="Message"/>
+          <input name="message" type="text" placeholder="Message" required autocomplete="off" />
           <button>Send</button>
         </form>
         <button id="send-location">Send location</button>
@@ -49,6 +48,16 @@
       </p>
       <p><a href={{url}} target="_blank">My Current Location</a></p>
     </div>
+  </script>
+
+  <script id="sidebar-template" type="text/html">
+    <h2 class="room-title">{{room}}</h2>
+    <h3 class="list-title">Users in room</h3>
+    <ul class="users">
+      {{#users}}
+        <li>&bull; {{username}}</li>
+      {{/users}}
+    </ul>
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.0.1/mustache.min.js"></script>

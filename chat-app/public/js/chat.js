@@ -10,19 +10,44 @@ const $messages = document.querySelector('#messages')
 // Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationTemplate = document.querySelector('#location-template').innerHTML
+const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML
 
 // Options
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
+
+const autoscroll = () => {
+  // New message element
+  const $newMessage = $messages.lastElementChild
+
+  // Height of the new message
+  const newMessageStyles = getComputedStyle($newMessage)
+  const newMessageMargin = parseInt(newMessageStyles.marginBottom)
+  const newMessageHeight = $newMessage.offsetHeight + newMessageMargin
+
+  // Visible height
+  const visibleHeight = $messages.offsetHeight
+
+  // Height of messages container
+  const containerHeight = $messages.scrollHeight
+
+  // How far have I scrolled ?
+  const scrollOffset = $messages.scrollTop + visibleHeight
+
+  if (containerHeight - newMessageHeight <= scrollOffset) {
+    $messages.scrollTop = $messages.scrollHeight
+  }
+}
 
 // Todo: Listen message and render it
 socket.on('message', message => {
   console.log(message)
   const html = Mustache.render(messageTemplate, {
     username: message.username,
-    message: message.text,
+    message: message.content,
     createdAt: moment(message.createdAt).format('h:mm:ss a')
   })
   $messages.insertAdjacentHTML('beforeend', html)
+  autoscroll()
 })
 
 // Todo: Listen locationMessage and render it
@@ -30,10 +55,17 @@ socket.on('locationMessage', message => {
   console.log(message)
   const html = Mustache.render(locationTemplate, {
     username: message.username,
-    url: message.text,
+    url: message.content,
     createdAt: moment(message.createdAt).format('h:mm:ss a')
   })
   $messages.insertAdjacentHTML('beforeend', html)
+  autoscroll()
+})
+
+// Todo: Show all users in room
+socket.on('roomData', ({ room, users }) => {
+  const html = Mustache.render(sidebarTemplate, { room, users })
+  document.querySelector('#sidebar').innerHTML = html
 })
 
 // Todo: Submit a message

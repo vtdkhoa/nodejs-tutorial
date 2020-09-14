@@ -5,6 +5,7 @@ const socketio = require('socket.io')
 const Filter = require('bad-words')
 const { generateMessage } = require('./utils/messages')
 const { addUser, getUser, getUsersInRoom, removeUser } = require('./utils/users')
+const { capitalLetter } = require('./utils/utilities')
 
 const app = express()
 const server = http.createServer(app)
@@ -18,7 +19,7 @@ app.use(express.static(publicDirectory))
 io.on('connection', socket => {
   console.log('WebSocket connection')
 
-  // Joining the chat
+  // Join the chat
   socket.on('join', (options, callback) => {
     const { error, user } = addUser({ id: socket.id, ...options })
 
@@ -29,11 +30,15 @@ io.on('connection', socket => {
     socket.join(user.room)
     socket.emit('message', generateMessage('Admin', `Welcome, ${user.username}`))
     socket.broadcast.to(user.room).emit('message', generateMessage('Admin', `${user.username} has joined!`))
+    io.to(user.room).emit('roomData', {
+      room: capitalLetter(user.room),
+      users: getUsersInRoom(user.room)
+    })
 
     callback()
   })
 
-  // Sending message
+  // Send message
   socket.on('sendMessage', (message, callback) => {
     const user = getUser(socket.id)
     const filter = new Filter()
@@ -46,7 +51,7 @@ io.on('connection', socket => {
     callback()
   })
 
-  // Sending location
+  // Send location
   socket.on('sendLocation', (coords, callback) => {
     const user = getUser(socket.id)
 
@@ -60,12 +65,16 @@ io.on('connection', socket => {
     callback()
   })
 
-  // Leaving room
+  // Leave room
   socket.on('disconnect', () => {
     const user = removeUser(socket.id)
 
     if (user) {
       io.to(user.room).emit('message', generateMessage('Admin', `${user.username} has left!`))
+      io.to(user.room).emit('roomData', {
+        room: capitalLetter(user.room),
+        users: getUsersInRoom(user.room)
+      })
     }
   })
 })
