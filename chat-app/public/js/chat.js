@@ -40,7 +40,6 @@ const autoscroll = () => {
 
 // Todo: Listen message and render it
 socket.on('message', message => {
-  console.log(message)
   const html = Mustache.render(messageTemplate, {
     username: message.username,
     message: message.content,
@@ -52,7 +51,6 @@ socket.on('message', message => {
 
 // Todo: Listen locationMessage and render it
 socket.on('locationMessage', message => {
-  console.log(message)
   const html = Mustache.render(locationTemplate, {
     username: message.username,
     url: message.content,
@@ -80,7 +78,7 @@ $messageForm.addEventListener('submit', event => {
     $messageFormInput.focus()
 
     if (error) {
-      return console.log(error)
+      throw new Error(error)
     }
     console.log('Message delivered!')
   })

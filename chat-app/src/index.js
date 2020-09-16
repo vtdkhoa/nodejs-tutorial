@@ -3,6 +3,7 @@ const path = require('path')
 const http = require('http')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
+const chalk = require('chalk')
 const { generateMessage } = require('./utils/messages')
 const { addUser, getUser, getUsersInRoom, removeUser } = require('./utils/users')
 const { capitalLetter } = require('./utils/utilities')
@@ -17,7 +18,7 @@ const publicDirectory = path.join(__dirname, '../public')
 app.use(express.static(publicDirectory))
 
 io.on('connection', socket => {
-  console.log('WebSocket connection')
+  console.log(chalk.green('WebSocket connection'))
 
   // Join the chat
   socket.on('join', (options, callback) => {
@@ -80,5 +81,5 @@ io.on('connection', socket => {
 })
 
 server.listen(port, () => {
-  console.log(`Server is up on port ${port}`)
+  console.log(chalk.blue(`Server is up on port ${port}`))
 })
